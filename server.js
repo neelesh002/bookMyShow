@@ -1,6 +1,8 @@
 const express = require('express');
 const connectDB = require('./connection');
 const Movie = require('./Schema')
+const swaggerUi = require('swagger-ui-express');
+const swaggerJSDoc = require('swagger-jsdoc');
 const dotenv = require('dotenv');
 dotenv.config();
 const PORT = process.env.PORT || 8080;
@@ -10,6 +12,23 @@ app.use(express.urlencoded({ extended: true }));
 
 
 
+ 
+
+const options = {
+  swaggerDefinition: {
+      info: {
+          title: 'Booking API',
+          version: '1.0.0',
+          description: 'API for managing movie bookings',
+      },
+  },
+  apis: ["./swagger/*.js"],
+};
+const swaggerSpec = swaggerJSDoc(options);
+
+// Swagger documentation route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+ 
 app.get("/api/booking", async (req, res) => {
     try {
         const lastBooking = await Movie.findOne().sort({ date_created: -1 });
